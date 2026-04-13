@@ -1,0 +1,719 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.S.A – École Aminata Bah | Gestion & Finances</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/montserrat@5.0.19/400.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/montserrat@5.0.19/700.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --navy: #0a1628;
+            --gold: #c8a84e;
+            --gold-l: #e8d48b;
+            --blue: #1a3a5c;
+            --bg: #eef2f7;
+            --sidebar-width: 270px;
+            --transition: 0.3s ease;
+            --accent-purple: #4f46e5;
+            --red: #ef4444;
+            --input-bg: #f8fafc;
+        }
+
+        * { font-family: 'Montserrat', sans-serif; box-sizing: border-box; }
+        body { background: var(--bg); color: #334155; margin: 0; overflow-x: hidden; }
+
+        /* Écran de Verrouillage */
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--navy);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            transition: opacity 0.5s ease;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .pin-input {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            width: 100%;
+            font-size: 2rem;
+            letter-spacing: 1rem;
+            text-align: center;
+            color: var(--navy);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .login-logo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--gold); margin-bottom: 1.5rem; }
+        .login-subtitle { color: rgba(255,255,255,0.8); margin-bottom: 0.8rem; }
+        .login-code-note {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 10px;
+            padding: 0.55rem 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #f8fafc;
+        }
+
+        /* Navigation */
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background: var(--navy); z-index: 1050; transition: transform var(--transition); overflow-y: auto; color: white; display: none; }
+        .sidebar.active-auth { display: block; }
+        .sidebar-header { text-align: center; padding: 2rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 0.5rem; }
+        
+        .nav-item { display: flex; align-items: center; padding: 0.8rem 1.5rem; color: rgba(255,255,255,0.7); cursor: pointer; transition: 0.2s; gap: 12px; font-size: 0.9rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(200,168,78,0.15); color: white; border-left: 4px solid var(--gold); }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); padding: 1.5rem 1.5rem 0.5rem; opacity: 0.8; font-weight: 700; }
+
+        .main-content { margin-left: var(--sidebar-width); transition: margin var(--transition); min-height: 100vh; display: none; }
+        .main-content.active-auth { display: block; }
+        .top-bar { background: white; padding: 0.8rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+
+        /* Cards & UI */
+        .content-padding { padding: 2rem; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+        .card-header { background: white; border-bottom: 1px solid #f1f5f9; font-weight: 700; padding: 1.2rem; }
+        
+        .stat-card { border-radius: 15px; padding: 1.5rem; color: white; position: relative; height: 100%; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .bg-blue { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        .bg-gold { background: linear-gradient(135deg, #92400e, #d97706); }
+        .bg-green { background: linear-gradient(135deg, #065f46, #10b981); }
+        .bg-red { background: linear-gradient(135deg, #991b1b, #ef4444); }
+
+        .form-control-custom { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.7rem 1rem; width: 100%; margin-bottom: 1rem; }
+        .btn-action { border-radius: 10px; font-weight: 600; padding: 0.7rem 1.5rem; border: none; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s; }
+        .btn-gold { background: var(--gold); color: white; }
+        .btn-navy { background: var(--navy); color: white; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-purple { background: var(--accent-purple); color: white; }
+        .btn-outline { background: white; border: 1px solid #e2e8f0; color: #334155; }
+        .btn-light-green { background: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
+        .btn-light-blue { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+        
+        .table-custom { font-size: 0.9rem; }
+        .table-custom thead { background: #0a1628; }
+        .table-custom thead th { color: white; font-weight: 600; padding: 1.2rem; border: none; text-transform: uppercase; letter-spacing: 1px; }
+        .table-custom td { padding: 1.5rem; vertical-align: middle; border: 1px solid #f1f5f9; }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Documents & Special components */
+        .cert-container { background: white; width: 210mm; min-height: 297mm; padding: 25mm; margin: 0 auto; position: relative; border: 1px solid #eee; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        
+        .card-student { width: 85.6mm; height: 54mm; background: white; border: 1px solid var(--gold); border-radius: 4mm; overflow: hidden; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card-header-student { background: var(--navy); color: white; height: 15mm; display: flex; align-items: center; padding: 0 4mm; gap: 3mm; font-size: 9pt; font-weight: bold; }
+        .card-body-student { display: flex; padding: 3mm; gap: 4mm; height: 31mm; }
+        .card-photo { width: 24mm; height: 28mm; background: #eee; border-radius: 2mm; object-fit: cover; }
+        .card-info { flex: 1; font-size: 8pt; line-height: 1.2; }
+        .card-footer-student { background: var(--navy); color: var(--gold); height: 8mm; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 4mm; font-size: 7pt; font-weight: bold; }
+
+        /* Planning & Bulletin Styles */
+        .planning-header { display: flex; align-items: center; gap: 15px; margin-bottom: 2rem; }
+        .planning-icon { background: var(--accent-purple); color: white; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        
+        /* Bulletins specific UI */
+        .trimestre-tabs { background: #f1f5f9; padding: 5px; border-radius: 12px; display: inline-flex; gap: 5px; }
+        .trim-tab { padding: 8px 18px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: transparent; color: #64748b; }
+        .trim-tab.active { background: var(--accent-purple); color: white; }
+
+        .notes-grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; padding: 0.8rem 2rem; color: #94a3b8; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .note-row-ui { background: white; border-radius: 18px; padding: 1.2rem 2rem; margin-bottom: 1rem; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; transition: 0.2s; }
+        .note-row-ui:hover { border-color: var(--accent-purple); }
+        .note-subject-label { font-weight: 800; font-style: italic; color: var(--navy); text-transform: uppercase; }
+        .note-entry-box { background: var(--input-bg); border-radius: 12px; padding: 10px; text-align: center; font-weight: 800; font-size: 1.2rem; min-width: 80px; }
+        .note-entry-box input { background: transparent; border: none; width: 100%; text-align: center; font-weight: 800; outline: none; }
+        .note-pondere { color: var(--accent-purple); font-weight: 800; font-size: 1.1rem; text-align: center; }
+
+        .footer-moyenne-sticky { background: var(--navy); border-radius: 25px; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; color: white; margin-top: 2rem; }
+        .moyenne-val-ui { font-size: 2.5rem; font-weight: 800; }
+        .moyenne-val-ui span { font-size: 1rem; opacity: 0.6; }
+
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1040; display: none; }
+
+        .course-box {
+            padding: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            position: relative;
+            text-align: center;
+            margin: 2px;
+        }
+        
+        .course-box .delete-course {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--red);
+            border-radius: 50%;
+            padding: 2px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .course-box .delete-course:hover {
+            transform: scale(1.2);
+            background: #dc2626;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 8px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+        .text-gold { color: var(--gold); }
+        .text-navy { color: var(--navy); }
+        .text-purple { color: var(--accent-purple); }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #f1f5f9;
+            background: #fafbfc;
+        }
+
+        .app-credit {
+            margin-top: 1.5rem;
+            padding: 1rem 1.2rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .alert-success, .alert-danger {
+            border: none;
+            border-radius: 12px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .overlay.open { display: block; }
+        }
+
+        @media print {
+            .no-print, .sidebar, .overlay, .top-bar { display: none !important; }
+            body { background: white !important; }
+            .main-content { margin-left: 0 !important; }
+            .content-padding { padding: 0 !important; }
+            .section { display: none !important; }
+            .section.active { display: block !important; }
+            .card, .cert-container { box-shadow: none !important; border: none !important; }
+            .cert-container { margin: 0; padding: 10mm; }
+            .table-custom thead th { background: #000 !important; color: white !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <img class="login-logo" src="https://image.qwenlm.ai/public_source/276cf7d0-467f-4df5-9908-19685ca07cd1/12c39949f-f810-4f38-ab6c-1da56679e0fc.png" alt="Logo GSA">
+        <h4 class="fw-bold mb-2">Connexion sécurisée</h4>
+        <p class="login-subtitle">Veuillez saisir le code d'accès pour continuer</p>
+        <div class="login-code-note">Saisissez votre code d'accès administrateur.</div>
+        <input id="pin-input" class="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4)">
+        <button class="btn-action btn-gold w-100 justify-content-center" onclick="validatePin()"><i class="bi bi-shield-lock"></i> Ouvrir l'application</button>
+    </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="https://image.qwenlm.ai/public_source/276cf7d0-467f-4df5-9908-19685ca07cd1/12c39949f-f810-4f38-ab6c-1da56679e0fc.png" alt="Logo">
+        <h6 class="mt-2 fw-bold text-gold">G.S.A Aminata Bah</h6>
+    </div>
+    <div class="nav-label">Tableau de bord</div>
+    <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard', this)"><i class="bi bi-speedometer2"></i> Accueil</div>
+    
+    <div class="nav-label">Académique</div>
+    <div class="nav-item" data-section="students" onclick="showSection('students', this)"><i class="bi bi-people"></i> Élèves</div>
+    <div class="nav-item" data-section="planning" onclick="showSection('planning', this)"><i class="bi bi-calendar3"></i> Planning</div>
+    <div class="nav-item" data-section="bulletins" onclick="showSection('bulletins', this)"><i class="bi bi-file-earmark-bar-graph"></i> Bulletins</div>
+    <div class="nav-item" data-section="documents" onclick="showSection('documents', this)"><i class="bi bi-file-earmark-pdf"></i> Certificats</div>
+    <div class="nav-item" data-section="cards" onclick="showSection('cards', this)"><i class="bi bi-person-badge"></i> Cartes Scolaires</div>
+
+    <div class="nav-label">Finances</div>
+    <div class="nav-item" data-section="finances" onclick="showSection('finances', this)"><i class="bi bi-cash-coin"></i> Scolarités</div>
+    <div class="nav-item" data-section="expenses" onclick="showSection('expenses', this)"><i class="bi bi-cart-dash"></i> Dépenses</div>
+    
+    <div class="mt-5 p-3">
+        <button class="btn btn-sm btn-outline-danger w-100" onclick="logout()"><i class="bi bi-box-arrow-left"></i> Déconnexion</button>
+    </div>
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="top-bar no-print">
+        <button class="btn d-lg-none" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <span class="fw-bold">Administration Scolaire</span>
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+            <button class="btn btn-sm btn-outline-primary" onclick="printActiveSection()">🖨️ Imprimer</button>
+            <button class="btn btn-sm btn-outline-success" onclick="downloadActiveSection()">⬇️ Télécharger / Enregistrer</button>
+            <div class="text-end ms-2">
+                <div id="digital-clock" class="fw-bold text-navy">00:00:00</div>
+                <div id="current-date" class="small text-muted">Date</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-padding">
+        <!-- SECTION DASHBOARD -->
+        <div id="section-dashboard" class="section active">
+            <div class="row g-3 mb-4">
+                <div class="col-md-3"><div class="stat-card bg-blue"><h6>Effectif Total</h6><h2 id="stat-total-students">0</h2><i class="bi bi-people-fill position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i></div></div>
+                <div class="col-md-3"><div class="stat-card bg-green"><h6>Recettes</h6><h2 id="stat-total-income">0</h2><i class="bi bi-graph-up-arrow position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i></div></div>
+                <div class="col-md-3"><div class="stat-card bg-red"><h6>Dépenses</h6><h2 id="stat-total-expenses">0</h2><i class="bi bi-cart-x position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i></div></div>
+                <div class="col-md-3"><div class="stat-card bg-gold"><h6>Solde</h6><h2 id="stat-balance">0</h2><i class="bi bi-wallet2 position-absolute top-50 end-0 translate-middle-y me-3 opacity-25" style="font-size: 3rem;"></i></div></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Inscriptions Récentes</div>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead><tr><th>Matricule</th><th>Nom & Prénom</th><th>Classe</th><th>Date</th></tr></thead>
+                        <tbody id="recent-students-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION BULLETINS (GESTION DES NOTES) -->
+        <div id="section-bulletins" class="section">
+            <div class="planning-header no-print justify-content-between flex-wrap gap-3 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="planning-icon" style="background: var(--accent-purple)"><i class="bi bi-calculator"></i></div>
+                    <div>
+                        <h4 class="fw-bold m-0 text-uppercase">Bulletins & Notes</h4>
+                        <span class="text-muted small fw-bold" id="active-student-display">Sélectionnez un élève</span>
+                    </div>
+                </div>
+                <div class="trimestre-tabs">
+                    <button class="trim-tab active" onclick="setTrimestre(1)">Trimestre 1</button>
+                    <button class="trim-tab" onclick="setTrimestre(2)">Trimestre 2</button>
+                    <button class="trim-tab" onclick="setTrimestre(3)">Trimestre 3</button>
+                </div>
+            </div>
+
+            <div class="card p-4 no-print border-0 shadow-sm mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-6">
+                        <label class="small fw-bold text-muted mb-2">Choisir l'élève</label>
+                        <select class="form-control-custom" id="notes-student-select" onchange="loadStudentNotes()"></select>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn-action btn-outline" onclick="printDoc('bulletin')"><i class="bi bi-printer"></i> Imprimer Bulletin</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="notes-input-area">
+                <div class="notes-grid-header no-print">
+                    <div>Matière Enseignée</div>
+                    <div class="text-center">Note / 20</div>
+                    <div class="text-center">Coeff.</div>
+                    <div class="text-center">Points</div>
+                </div>
+
+                <div id="notes-list-container">
+                    <!-- Rempli par JS -->
+                </div>
+
+                <div class="footer-moyenne-sticky">
+                    <div>
+                        <div class="small fw-bold text-uppercase opacity-75">Moyenne Générale</div>
+                        <div class="moyenne-val-ui" id="moyenne-finale">0.00 <span>/ 20</span></div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-link text-white text-decoration-none fw-bold no-print" onclick="resetNotes()">EFFACER</button>
+                        <button class="btn-action btn-purple px-5" onclick="saveNotes(this)">
+                            <i class="bi bi-floppy-fill"></i> ENREGISTRER
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION PLANNING HEBDOMADAIRE -->
+        <div id="section-planning" class="section">
+            <div class="planning-header no-print">
+                <div class="planning-icon"><i class="bi bi-calendar-week"></i></div>
+                <div>
+                    <h4 class="fw-bold m-0 text-uppercase">Planning Hebdomadaire</h4>
+                    <span class="text-muted small">GESTION SCOLAIRE</span>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-4 no-print">
+                <button class="btn-action btn-outline" onclick="printDoc('planning')"><i class="bi bi-printer"></i> Imprimer</button>
+                <button class="btn-action btn-light-green"><i class="bi bi-share"></i> Envoyer aux parents</button>
+                <button class="btn-action btn-light-blue"><i class="bi bi-people"></i> Envoyer aux élèves</button>
+                <button class="btn-action btn-purple ms-auto" onclick="openCourseModal()"><i class="bi bi-plus-lg"></i> Ajouter cours</button>
+            </div>
+
+            <div class="card border-0 overflow-hidden shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-custom m-0" id="timetable">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%;">Heure</th>
+                                <th style="width: 17%;">Lundi</th>
+                                <th style="width: 17%;">Mardi</th>
+                                <th style="width: 17%;">Mercredi</th>
+                                <th style="width: 17%;">Jeudi</th>
+                                <th style="width: 17%;">Vendredi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-time="08:00 - 10:00">
+                                <td class="fw-bold text-navy"><i class="bi bi-clock me-2 text-purple"></i> 08:00 - 10:00</td>
+                                <td data-day="Lundi"></td><td data-day="Mardi"></td><td data-day="Mercredi"></td><td data-day="Jeudi"></td><td data-day="Vendredi"></td>
+                            </tr>
+                            <tr data-time="10:30 - 12:30">
+                                <td class="fw-bold text-navy"><i class="bi bi-clock me-2 text-purple"></i> 10:30 - 12:30</td>
+                                <td data-day="Lundi"></td><td data-day="Mardi"></td><td data-day="Mercredi"></td><td data-day="Jeudi"></td><td data-day="Vendredi"></td>
+                            </tr>
+                            <tr data-time="14:00 - 16:00">
+                                <td class="fw-bold text-navy"><i class="bi bi-clock me-2 text-purple"></i> 14:00 - 16:00</td>
+                                <td data-day="Lundi"></td><td data-day="Mardi"></td><td data-day="Mercredi"></td><td data-day="Jeudi"></td><td data-day="Vendredi"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION ELEVES -->
+        <div id="section-students" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0">Gestion des Élèves</h4>
+                <button class="btn-action btn-gold" onclick="openStudentModal()"><i class="bi bi-plus-circle"></i> Ajouter un élève</button>
+            </div>
+            <div class="card p-3 mb-3 no-print">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="small fw-bold mb-1">Recherche</label>
+                        <input type="text" class="form-control-custom mb-0" id="student-search" placeholder="Nom, prénom, matricule ou parent" oninput="handleStudentFilterChange()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold mb-1">Classe</label>
+                        <select class="form-control-custom mb-0" id="student-class-filter" onchange="handleStudentFilterChange()">
+                            <option value="all">Toutes les classes</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2 justify-content-md-end flex-wrap">
+                        <button class="btn-action btn-outline" onclick="resetStudentFilters()"><i class="bi bi-funnel"></i> Réinitialiser</button>
+                        <button class="btn-action btn-light-blue" onclick="exportData()"><i class="bi bi-download"></i> Exporter</button>
+                        <button class="btn-action btn-light-green" onclick="triggerImportData()"><i class="bi bi-upload"></i> Importer</button>
+                    </div>
+                </div>
+                <div class="small text-muted mt-2" id="students-count-display">0 élève affiché</div>
+                <input type="file" id="import-data-input" accept="application/json" class="d-none" onchange="importData(event)">
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead><tr><th>Matricule</th><th>Photo</th><th>Nom & Prénom</th><th>Classe</th><th>Parent</th><th>Actions</th></tr></thead>
+                        <tbody id="full-students-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION DOCUMENTS (CERTIFICATS) -->
+        <div id="section-documents" class="section">
+            <div class="row">
+                <div class="col-md-4 no-print">
+                    <div class="card p-3">
+                        <label class="small fw-bold mb-1">Sélectionner l'élève</label>
+                        <select class="form-control-custom" id="doc-student-select" onchange="generateCertPreview()"></select>
+                        <label class="small fw-bold mb-1">Année Scolaire</label>
+                        <input type="text" class="form-control-custom" id="doc-year" value="2024-2025" oninput="generateCertPreview()">
+                        <button class="btn-action btn-navy w-100 mb-2" onclick="printDoc('certificate')"><i class="bi bi-printer"></i> Imprimer</button>
+                        <button class="btn-action btn-gold w-100" onclick="exportDocToPDF()"><i class="bi bi-file-earmark-pdf"></i> Exporter PDF</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div id="cert-preview-area" class="bg-dark p-4 rounded overflow-auto" style="height: 80vh;">
+                        <div class="cert-container" id="printable-cert">
+                            <div class="d-flex justify-content-between align-items-start border-bottom border-dark pb-3 mb-5">
+                                <div class="text-center" style="font-size: 8pt; width: 30%;">REPUBLIQUE DE GUINEE<br>Travail - Justice - Solidarité<br>---<br>MEPU-A</div>
+                                <div class="text-center">
+                                    <img src="https://image.qwenlm.ai/public_source/276cf7d0-467f-4df5-9908-19685ca07cd1/12c39949f-f810-4f38-ab6c-1da56679e0fc.png" style="width: 60px;">
+                                    <h5 class="fw-bold mt-2">G.S.A AMINATA BAH</h5>
+                                </div>
+                                <div class="text-center" style="font-size: 8pt; width: 30%;">IRE : Kindia<br>Localité : Linsan</div>
+                            </div>
+                            <div class="text-center mb-5">
+                                <h1 style="text-decoration: underline; font-weight: 800; font-size: 28pt;">CERTIFICAT DE SCOLARITÉ</h1>
+                            </div>
+                            <div style="font-size: 14pt; line-height: 2; text-align: justify;">
+                                <p>Je soussigné, Monsieur le Directeur Général du Groupe Scolaire Privé <strong>Aminata Bah</strong>, certifie que l'élève :</p>
+                                <div class="p-3 my-4 bg-light border-start border-5 border-dark">
+                                    NOM & PRÉNOM : <strong id="preview-name">...</strong><br>
+                                    MATRICULE : <strong id="preview-mat">...</strong><br>
+                                    CLASSE : <strong id="preview-class">...</strong>
+                                </div>
+                                <p>Est régulièrement inscrit(e) dans notre établissement pour le compte de l'année scolaire <strong id="preview-year">2024-2025</strong>.</p>
+                                <p>En foi de quoi, le présent certificat lui est délivré pour servir et valoir ce que de droit.</p>
+                            </div>
+                            <div class="mt-5 d-flex justify-content-between">
+                                <span>Fait à Linsan, le <span id="preview-date">...</span></span>
+                                <div class="text-center">
+                                    <strong>Le Directeur Général</strong><br>
+                                    <div style="height: 80px;"></div>
+                                    <span class="text-decoration-underline">Dr. BAH Ibrahima</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION CARTES -->
+        <div id="section-cards" class="section">
+            <div class="row">
+                <div class="col-md-4 no-print">
+                    <div class="card p-3">
+                        <label class="small fw-bold mb-1">Choisir l'élève</label>
+                        <select class="form-control-custom" id="card-student-select" onchange="generateCardPreview()"></select>
+                        <button class="btn-action btn-gold w-100" onclick="printCard()"><i class="bi bi-printer"></i> Imprimer la carte</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div id="card-preview-area" class="d-flex justify-content-center p-5 bg-secondary rounded shadow-inner">
+                        <div class="card-student" id="printable-card">
+                            <div class="card-header-student">
+                                <img src="https://image.qwenlm.ai/public_source/276cf7d0-467f-4df5-9908-19685ca07cd1/12c39949f-f810-4f38-ab6c-1da56679e0fc.png" style="width: 10mm; height: 10mm;">
+                                G.S.A AMINATA BAH (Linsan)
+                            </div>
+                            <div class="card-body-student">
+                                <img id="card-preview-img" src="" class="card-photo">
+                                <div class="card-info">
+                                    <div class="text-muted" style="font-size: 6pt;">NOM & PRÉNOM</div>
+                                    <div class="fw-bold text-uppercase" id="card-preview-name" style="font-size: 9pt; color: var(--navy);">...</div>
+                                    <div class="mt-1 text-muted" style="font-size: 6pt;">CLASSE</div>
+                                    <div class="fw-bold" id="card-preview-class">...</div>
+                                    <div class="mt-1 text-muted" style="font-size: 6pt;">MATRICULE</div>
+                                    <div class="fw-bold text-danger" id="card-preview-mat">...</div>
+                                </div>
+                            </div>
+                            <div class="card-footer-student">
+                                <span>CARTE SCOLAIRE</span>
+                                <span>2024-2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINANCES -->
+        <div id="section-finances" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0">Paiements de Scolarité</h4>
+                <button class="btn-action btn-navy" onclick="openPaymentModal()"><i class="bi bi-cash-stack"></i> Encaisser</button>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead><tr><th>Date</th><th>Élève</th><th>Motif</th><th>Montant</th><th>Statut</th></tr></thead>
+                        <tbody id="payments-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- DEPENSES -->
+        <div id="section-expenses" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0">Journal des Dépenses</h4>
+                <button class="btn-action btn-red" onclick="openExpenseModal()"><i class="bi bi-cart-dash"></i> Nouvelle Dépense</button>
+            </div>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead><tr><th>Date</th><th>Objet</th><th>Catégorie</th><th>Montant</th><th>Actions</th></tr></thead>
+                        <tbody id="expenses-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-credit no-print">
+            <div>© Ibrahima Garki Diallo — Développeur</div>
+            <div>📧 garkidi3@gmail.com</div>
+            <div>📞 +32 466 05 37 45</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal fade" id="modal-course" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter un cours au planning</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="course-form" onsubmit="saveCourse(event)">
+                <div class="modal-body">
+                    <label class="small fw-bold">Matière</label>
+                    <input type="text" class="form-control-custom" id="course-subject" placeholder="ex: Mathématiques" required>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="small fw-bold">Jour</label>
+                            <select class="form-control-custom" id="course-day" required>
+                                <option>Lundi</option><option>Mardi</option><option>Mercredi</option><option>Jeudi</option><option>Vendredi</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold">Créneau</label>
+                            <select class="form-control-custom" id="course-time" required>
+                                <option>08:00 - 10:00</option><option>10:30 - 12:30</option><option>14:00 - 16:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label class="small fw-bold">Professeur</label>
+                    <input type="text" class="form-control-custom" id="course-prof" placeholder="Nom de l'enseignant">
+                    <label class="small fw-bold">Salle</label>
+                    <input type="text" class="form-control-custom" id="course-room" placeholder="ex: Salle 04">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-action btn-purple w-100">Enregistrer dans le planning</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-student" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gestion Élève</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="student-form" onsubmit="saveStudent(event)">
+                <input type="hidden" id="student-id">
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="row g-2">
+                        <div class="col-6"><input type="text" class="form-control-custom" id="student-firstname" placeholder="Prénom" required></div>
+                        <div class="col-6"><input type="text" class="form-control-custom" id="student-lastname" placeholder="Nom" required></div>
+                    </div>
+                    <label class="small fw-bold mb-1">Classe</label>
+                    <select class="form-control-custom" id="student-class" required>
+                        <option value="">Sélectionner</option>
+                        <optgroup label="MATERNELLE"><option>Maternelle</option></optgroup>
+                        <optgroup label="PRIMAIRE"><option>1ère année</option><option>2ème année</option><option>3ème année</option><option>4ème année</option><option>5ème année</option><option>6ème année</option></optgroup>
+                        <optgroup label="SECONDAIRE"><option>7ème</option><option>8ème</option><option>9ème</option><option>10ème</option><option>Terminale</option></optgroup>
+                    </select>
+                    <input type="text" class="form-control-custom" id="student-parent" placeholder="Nom du Tuteur">
+                    <input type="tel" class="form-control-custom" id="student-phone" placeholder="Téléphone">
+                    <input type="file" class="form-control-custom" onchange="handleImage(event)">
+                    <div id="image-preview-box" class="text-center d-none"><img id="image-preview" src="" style="width: 100px; height: 100px; border-radius: 10px; object-fit: cover; border: 2px solid var(--gold);"></div>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn-action btn-navy w-100">Enregistrer</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-payment" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Encaissement</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="payment-form" onsubmit="savePayment(event)">
+                <div class="modal-body">
+                    <label class="small fw-bold mb-2">Élève</label>
+                    <select class="form-control-custom" id="payment-student" required></select>
+                    <label class="small fw-bold mb-2">Montant (GNF)</label>
+                    <input type="number" class="form-control-custom" id="payment-amount" placeholder="Montant" min="1" required>
+                    <label class="small fw-bold mb-2">Motif</label>
+                    <input type="text" class="form-control-custom" id="payment-motif" placeholder="Motif du paiement" required>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn-action btn-navy w-100">Confirmer Paiement</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-expense" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Nouvelle Dépense</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <form id="expense-form" onsubmit="saveExpense(event)">
+                <div class="modal-body">
+                    <label class="small fw-bold mb-2">Libellé</label>
+                    <input type="text" class="form-control-custom" id="expense-label" placeholder="Description" required>
+                    <label class="small fw-bold mb-2">Montant (GNF)</label>
+                    <input type="number" class="form-control-custom" id="expense-amount" placeholder="Montant" min="1" required>
+                    <label class="small fw-bold mb-2">Catégorie</label>
+                    <select class="form-control-custom" id="expense-cat">
+                        <option>Fournitures</option>
+                        <option>Salaires</option>
+                        <option>Charges</option>
+                        <option>Entretien</option>
+                        <option>Autres</option>
+                    </select>
+                </div>
+                <div class="modal-footer"><button type="submit" class="btn-action btn-red w-100">Valider Sortie</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
+

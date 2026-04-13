@@ -1,0 +1,11 @@
+# Build and release artifacts
+release/
+*.zip
+
+# Netlify local files
+.netlify/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
