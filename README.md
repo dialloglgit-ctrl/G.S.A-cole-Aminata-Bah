@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎓 G.S.A AMINATA BAH - Système de Gestion Scolaire & Financière
 
 ![Version](https://img.shields.io/badge/Version-1.0-green?style=flat-square)
@@ -33,9 +34,7 @@ https://votre-serveur.com/index.html
 ```
 
 ### 2. **Se Connecter**
-```
-Code d'accès : 1524
-```
+Utilisez le code d'accès administrateur défini dans `app.js` (constante `ACCESS_CODE`).
 
 ### 3. **C'est Prêt! 🎉**
 
@@ -264,7 +263,7 @@ location.reload();
 
 ### ⚠️ Avant d'Utiliser en Production
 
-- [ ] Changez le code PIN (1425 → personnalisé)
+- [ ] Changez le code PIN administrateur (personnalisé)
 - [ ] Configurez HTTPS sur votre serveur
 - [ ] Testez sur tous les navigateurs
 - [ ] Établissez une politique de backup
@@ -333,12 +332,12 @@ Utilisateurs: 1 (PIN) → Extensible ✅
 
 **🎉 Application Prête à l'Emploi!**
 
-Ouvrez `index.html` et commencez! Code: `1425`
+Ouvrez `index.html` et commencez.
 
 Pour aide détaillée, consultez les fichiers `.md` ci-dessus.
 
 ---
 
-**Dernière mise à jour** : 7 avril 2026  
+**Dernière mise à jour** : 13 avril 2026  
 **Version** : 1.0 Stable ✅  
 **Statut** : Production Ready 🚀
